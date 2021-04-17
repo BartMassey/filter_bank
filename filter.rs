@@ -1,27 +1,27 @@
 pub fn lattice_filter(x: f32, coeffs: [f32; 48], g: &mut [f32; 48]) -> f32 {
-    let y = coeffs
+    let mut acc = x;
+    let pairs = coeffs
         .iter()
         .rev()
-        .zip(g.iter_mut())
-        .fold(x, |acc, (coeff, delay)| {
-            // first add the delayed value into the accumulator
-            let new_acc = acc - (*delay * *coeff);
+        .cloned()
+        .zip(g.iter_mut());
+    for (coeff, delay) in pairs {
+        // first add the delayed value into the accumulator
+        let new_acc = acc - *delay * coeff;
 
-            // then add the accumulated value into the delay
-            *delay = *delay + (new_acc * *coeff);
+        // then add the accumulated value into the delay
+        *delay += new_acc * coeff;
 
-            // and put the accumulated value into the next step
-            new_acc
-        });
+        // and put the accumulated value into the next step
+        acc = new_acc;
+    }
 
     // then we add the result into the delay register
-    g[0] = y;
-    assert_eq!(y, 0.5);
+    g[0] = acc;
     g.rotate_left(1);
-    assert_eq!(g[47], 0.5);
 
     // and return the found output
-    y
+    acc
 }
 
 #[test]
