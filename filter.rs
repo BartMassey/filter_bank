@@ -6,11 +6,20 @@ pub fn lattice_filter(x: f32, coeffs: [f32; 48], g: &mut [f32; 48]) -> f32 {
         .cloned()
         .zip(g.iter_mut());
     for (coeff, delay) in pairs {
-        // first add the delayed value into the accumulator
-        let new_acc = acc - *delay * coeff;
+        let new_acc;
+        if cfg!(feature = "fma") {
+            // first add the delayed value into the accumulator
+            new_acc = f32::mul_add(-coeff, *delay, acc);
 
-        // then add the accumulated value into the delay
-        *delay += new_acc * coeff;
+            // then add the accumulated value into the delay
+            *delay = f32::mul_add(coeff, new_acc, *delay);
+        } else {
+            // first add the delayed value into the accumulator
+            new_acc = acc - *delay * coeff;
+
+            // then add the accumulated value into the delay
+            *delay += new_acc * coeff;
+        }
 
         // and put the accumulated value into the next step
         acc = new_acc;
