@@ -1,9 +1,10 @@
 # filter_bank: optimization of filter bank function in Rust and C
 Bart Massey
 
-The code here originated from this Reddit
-[thread](https://www.reddit.com/r/rust/comments/mscxr7/why_no_loop_unrolling_in_this_function/). It apparently
-is an implementation of a piece of a DSP filter bank.
+The code in `filter-orig.rs` here came from this Reddit
+[thread](https://www.reddit.com/r/rust/comments/mscxr7/why_no_loop_unrolling_in_this_function/). It
+apparently is an implementation of a piece of a DSP filter
+bank.
 
 The Rust version here is my rewrite of that code to clean it
 up a bit. The C version was hand-translated from the
